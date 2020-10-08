@@ -1,0 +1,830 @@
+body {
+  /* display: flex;
+  height: 100vh; */
+  padding: 0;
+  margin: 0;
+}
+
+.cb-app-bar.mdc-top-app-bar {
+  z-index: 7;
+}
+
+.mdc-drawer-app-content {
+  flex: auto;
+  overflow: auto;
+  position: relative;
+}
+
+.cb-body .mdc-drawer--dismissible {
+  display: flex;
+  width: 60px;
+}
+
+/* Weather Popup on Cellphones */
+@media (max-width: 599px) {
+  .cb-body .mdc-drawer--dismissible {
+    width: 0px;
+  }
+}
+
+.cb-body .mdc-drawer--dismissible.mdc-drawer--open {
+  width: 256px;
+}
+
+.main-content {
+  overflow: auto;
+  height: 100%;
+}
+
+.app-bar {
+  position: absolute;
+}
+
+.mdc-top-app-bar.app-bar.cb-app-bar {
+  background-color: rgb(0, 174, 228);
+}
+
+.mdc-top-app-bar__title.cb-app-bar-title {
+  font-family: 'Ubuntu', sans-serif;
+}
+
+.mdc-top-app-bar__title.cb-app-bar-title img {
+  /* width: 210px; */
+  height: 45px;
+  vertical-align: middle;
+}
+
+.mdc-top-app-bar__title.cb-app-bar-title span {
+  font-size: .7rem;
+  font-weight: 400;
+  position: absolute;
+  top: 0;
+}
+
+.cb-app-bar-about-lg {
+  margin-left: auto;
+  margin-right: 8px;
+  font-family: 'Ubuntu', sans-serif;
+  color: rgba(58,56,54,1);
+}
+
+.cb-app-bar-about-lg a {
+  color: rgba(58,56,54,1);
+  text-decoration: none;
+  font-weight: 400;
+}
+
+@media (max-width: 599px) {
+  .cb-app-bar-about-lg {
+    display: none;
+  }
+  .cb-about-sm hr {
+    margin: 8px;
+    border-color: rgba(58,56,54,.3);
+    border-bottom-width: 0;
+  }
+}
+
+@media (min-width: 600px) {
+  .cb-app-bar-about-lg a:hover {
+    font-weight: 500;
+  }
+  .cb-about-sm {
+    display: none;
+  }
+}
+
+.cb-app-bar-lang {
+  margin-left: auto;
+  margin-right: 8px;
+  font-family: 'Ubuntu', sans-serif;
+  color: rgba(58,56,54,1);
+  display: none;
+}
+
+.cb-app-bar-lang-sm {
+  display: none;
+}
+
+.cb-app-bar-lang a {
+  color: rgba(58,56,54,1);
+  text-decoration: none;
+}
+
+@media (min-width: 600px) {
+  .cb-app-bar-lang a:hover {
+    color: #f2f2f2;
+  }
+}
+
+@media (max-width: 599px) {
+  .cb-app-bar-lang-lg {
+    display: none;
+  }
+  .cb-app-bar-lang-sm {
+    display: block;
+  }
+}
+
+.cb-body .mdc-top-app-bar__section {
+  box-shadow: 
+    /* 0px 2px 4px -1px rgba(0,0,0,0.2), 
+    0px 4px 5px 0px rgba(0,0,0,0.14),  */
+    0px 1px 10px 0px rgba(0,0,0,0.2);
+    padding: 8px 4px;
+}
+
+.mdc-top-app-bar__title.cb-app-bar-title, 
+.mdc-top-app-bar .mdc-icon-button.cb-nav-button {
+  color: rgba(58,56,54,1);
+}
+
+.mdc-drawer {
+  /* top:4.5rem; */
+  position: fixed !important;
+}
+
+.mdc-drawer.cb-drawer {
+  box-shadow: 0 0 10px 2px rgba(0,0,0,0.1);
+}
+
+#cb-list {
+  display: flex;
+  flex-direction: column;
+}
+/* @media (max-width: 599px) {
+  .mdc-top-app-bar--fixed-adjust {
+    padding-top: 0;
+  }
+}
+.flp-body .mdc-top-app-bar--fixed-adjust {
+  padding-top: 0;
+} */
+
+/* Map */
+#map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+.cb-map .mapboxgl-ctrl-top-right {
+  top: 60px;
+}
+
+.cb-map .mapboxgl-ctrl-bottom-left {
+  left: 60px;
+}
+
+.cb-drawer .mdc-list h5 {
+  margin: 0 8px;
+}
+
+.cb-list-item:hover {
+  background-color: rgba(0,174,228,0.04);
+}
+
+.cb-list-item.cb-active {
+  background-color: rgba(0,174,228,0.04);
+}
+
+/* @media (max-width: 599px) {
+  .cb-list-item.cb-active:after {
+    content: "V";
+    width: 10px;
+    border: none;
+    left: -1px;
+    top: -1px;
+    box-shadow: none;
+    position: absolute;
+  }
+} */
+
+.cb-list-item.cb-active:hover {
+  background-color: rgba(0,174,228,0.06);
+}
+
+.mdc-list-item.cb-list-item i {
+  display: none;
+}
+.cb-list-item.cb-active i {
+  display: inline-flex;
+  margin-right: 0;
+  margin-left: auto;
+}
+
+.cb-map-icon {
+  margin-right: 15px;
+  height: 30px;
+}
+
+/* Search Tool */
+@media (max-width: 599px) {
+  .mapboxgl-ctrl-geocoder.mapboxgl-ctrl {
+    max-width: 280px;
+    min-width: unset;
+    width: 50px;
+  }
+
+  .mapboxgl-ctrl-top-right .mapboxgl-ctrl-geocoder, .mapboxgl-ctrl-top-right
+  .mapboxgl-ctrl-geocoder .suggestions {
+    box-shadow: 0 0 0 2px rgba(0,0,0,.1);
+  }
+
+  .mapboxgl-ctrl-geocoder--icon.mapboxgl-ctrl-geocoder--icon-search {
+    width: 48px;
+    left: 1px;
+    top: 1px;
+    padding-top: 11px;
+    padding-bottom: 10px;
+    height: 48px;
+    z-index: 3;
+    background-color: #fff;
+    border-radius: 5px;
+  }
+
+  .mapboxgl-ctrl-geocoder .mapboxgl-ctrl-geocoder--input {
+    padding: 6px 45px 6px 48px;
+  }
+
+  .mapboxgl-ctrl-geocoder .mapboxgl-ctrl-geocoder--pin-right .mapboxgl-ctrl-geocoder--button {
+    width: 48px;
+    height: 48px;
+    top: 2px;
+    right: 0px;
+    border-radius: 15px;
+    display: block;
+  }
+  .mapboxgl-ctrl-geocoder .mapboxgl-ctrl-geocoder--pin-right .mapboxgl-ctrl-geocoder--button .mapboxgl-ctrl-geocoder--icon-close {
+    margin-top: 3px;
+  }
+  /* .mapboxgl-ctrl-geocoder--icon-close {
+    margin-top: 0;
+  } */
+  .mapboxgl-ctrl-geocoder .mapboxgl-ctrl-geocoder--pin-right .mapboxgl-ctrl-geocoder--icon-loading {
+    background-color: #ffffff;
+    right: 13px;
+    top: 9px;
+  }
+  /* .mapboxgl-ctrl-geocoder .mapboxgl-ctrl-geocoder--pin-right > * {
+    display: inline-block;
+  } */
+}
+
+  /* .mapboxgl-ctrl-geocoder .mapboxgl-ctrl-geocoder--pin-right .mapboxgl-ctrl-geocoder--button {
+    display: inline-block;
+  } */
+
+
+
+/* Zoom Controls */
+@media (max-width: 599px) {
+  .mapboxgl-ctrl.mapboxgl-ctrl-group button {
+    width: 50px;
+    height: 50px;
+  }
+  .mapboxgl-ctrl-group .mapboxgl-ctrl-compass {
+    display: none;
+  }
+}
+
+/* Popups */
+@media (max-width: 599px) {
+  .mapboxgl-popup {
+    z-index: 3;
+    width: 210px;
+  }
+}
+.mapboxgl-popup .mapboxgl-popup-tip {
+  z-index: 2;
+}
+
+.mapboxgl-popup .mapboxgl-popup-content {
+  min-width: 200px;
+  box-shadow: 0 11px 15px -7px rgba(0,0,0,.2), 0 24px 38px 3px rgba(0,0,0,.14), 0 9px 46px 8px rgba(0,0,0,.12);
+  z-index: 1;
+  font-family: 'Ubuntu', sans-serif;
+  color: rgba(58,56,54,1);
+  border-radius: 4px;
+}
+
+.mapboxgl-popup .mapboxgl-popup-content .mapboxgl-popup-close-button {
+  width: auto;
+  font-size: 1.5rem;
+}
+
+@media (max-width: 599px) {
+  .mapboxgl-popup .mapboxgl-popup-content .mapboxgl-popup-close-button {
+    width: 50px;
+    height: 50px;
+  }
+  .mapboxgl-popup .mapboxgl-popup-content h2 {
+    max-width: 180px;
+  }
+}
+
+.mapboxgl-popup .mapboxgl-popup-content .cb-popup-header p {
+  margin-top: .2rem;
+  margin-bottom: .2rem;
+}
+
+.mapboxgl-popup .mapboxgl-popup-content .cb-popup-header img {
+  min-width: 100%;
+}
+
+/* .mapboxgl-popup .mapboxgl-popup-content > div {
+  border-top: 1px solid lightgray; */
+  /* padding-top: .5em;
+  padding-bottom: 1em;
+} */
+
+/* .mapboxgl-popup .mapboxgl-popup-content > div:nth-child(2) {
+  border-top: 0;
+  padding-top: 0;
+} */
+
+/* .mapboxgl-popup .mapboxgl-popup-content > div:nth-child(3) {
+  padding-top: 0;
+} */
+
+/* .mapboxgl-popup .mapboxgl-popup-content > div:nth-child(4) {
+  padding-top: 0;
+  pa
+} */
+
+.mapboxgl-popup .mapboxgl-popup-content h2 {
+  margin-top: 0;
+  font-weight: 500;
+  font-size: 1.1rem;
+  margin-bottom: .2rem;
+}
+
+/* .mapboxgl-popup .mapboxgl-popup-content p {
+  margin-top: .3em;
+  margin-bottom: 0;
+} */
+
+.mapboxgl-popup .mapboxgl-popup-content h3 {
+  /* margin-top: .5em;
+  margin-bottom: 0; */
+  font-weight: 500;
+  margin-top: 0;
+  margin-bottom: .3rem;
+}
+
+.mapboxgl-popup .mapboxgl-popup-content button {
+  width: 100%;
+  /* margin-top: .2em; */
+  text-align: center;
+  line-height: 1.5rem;
+}
+
+.mapboxgl-popup .mapboxgl-popup-content button i {
+  font-size: 1.5rem;
+  position: absolute;
+  left: .8rem;
+}
+
+.mapboxgl-popup .mapboxgl-popup-content button span{
+  vertical-align: middle;
+}
+
+.cb-popup-contact {
+  margin-top: .3rem;
+}
+
+.cb-popup-parking .cb-popup-contact,
+.cb-popup-restroom .cb-popup-contact {
+  display: none;
+}
+
+.cb-popup-contact .cb-popup-call {
+  display: block;
+  padding: 0;
+}
+
+.cb-popup-contact .cb-popup-call a {
+  display: block;
+  padding: 1px 6px;
+}
+
+.cb-btn-disable {
+  color: lightgray;
+}
+
+/* .mapboxgl-marker {
+  position: absolute;
+  top: 0;
+  left: 0;
+  will-change: transform;
+} */
+
+.mapboxgl-user-location-dot.mapboxgl-marker.mapboxgl-marker-anchor-center {
+    border-radius: 50%;
+}
+
+.mapboxgl-user-location-dot.mapboxgl-marker.mapboxgl-marker-anchor-center,
+.mapboxgl-user-location-dot.mapboxgl-marker.mapboxgl-marker-anchor-center::before,
+.mapboxgl-user-location-dot.mapboxgl-marker.mapboxgl-marker-anchor-center:after {
+  width: 26px;
+  height: 26px;
+}
+
+.mapboxgl-user-location-dot.mapboxgl-marker.mapboxgl-marker-anchor-center:after {
+  content:  url(./img/i-person-pin.svg);
+  border: none;
+  left: -1px;
+  top: -1px;
+  box-shadow: none;
+  /* content: '';
+  background-image: url(./img/i-person-pin.svg);
+  background-size: 28px 28px; */
+}
+
+/* .mapboxgl-user-location-dot {
+  background-color: #1da1f2;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+}
+
+.mapboxgl-user-location-dot::before {
+  background-color: #1da1f2;
+  content: '';
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  position: absolute;
+  -webkit-animation: mapboxgl-user-location-dot-pulse 2s infinite;
+  -moz-animation: mapboxgl-user-location-dot-pulse 2s infinite;
+  -ms-animation: mapboxgl-user-location-dot-pulse 2s infinite;
+  animation: mapboxgl-user-location-dot-pulse 2s infinite;
+}
+
+.mapboxgl-user-location-dot::after {
+  border-radius: 50%;
+  border: 2px solid #fff;
+  content: '';
+  height: 19px;
+  left: -2px;
+  position: absolute;
+  top: -2px;
+  width: 19px;
+  box-sizing: border-box;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.35);
+}
+
+@-webkit-keyframes mapboxgl-user-location-dot-pulse {
+  0%   { -webkit-transform: scale(1); opacity: 1; }
+  70%  { -webkit-transform: scale(3); opacity: 0; }
+  100% { -webkit-transform: scale(1); opacity: 0; }
+}
+
+@-ms-keyframes mapboxgl-user-location-dot-pulse {
+  0%   { -ms-transform: scale(1); opacity: 1; }
+  70%  { -ms-transform: scale(3); opacity: 0; }
+  100% { -ms-transform: scale(1); opacity: 0; }
+}
+
+@keyframes mapboxgl-user-location-dot-pulse {
+  0%   { transform: scale(1); opacity: 1; }
+  70%  { transform: scale(3); opacity: 0; }
+  100% { transform: scale(1); opacity: 0; }
+}
+
+.mapboxgl-user-location-dot-stale {
+  background-color: #aaa;
+}
+
+.mapboxgl-user-location-dot-stale::after {
+  display: none;
+}
+
+.mapboxgl-user-location-accuracy-circle {
+  background-color: #1da1f233;
+  width: 1px;
+  height: 1px;
+  border-radius: 100%;
+} */
+
+#info {
+  display: block;
+  position: absolute;
+  right: 10px;
+  bottom: 30px;
+  margin: 0px auto;
+  width: auto;
+  padding: 10px;
+  border: none;
+  border-radius: 3px;
+  font-size: 11px;
+  text-align: center;
+  color: rgb(0, 0, 0);
+}
+
+
+
+
+#instructions {
+  position: absolute;
+  bottom: 0;
+  margin: 0;
+  z-index: 2;
+  right: 0;
+  left: 60px;
+  padding: 20px 0 0 20px;
+  background-color: rgba(255, 255, 255, 1);
+  font-size: 0.8em;
+  line-height: 2em;
+  height: auto;
+  font-family: 'Ubuntu', sans-serif;
+  color: rgba(58,56,54,1);
+  box-shadow: 0 11px 15px -7px rgba(0,0,0,.2), 0 24px 38px 3px rgba(0,0,0,.14),;
+  box-shadow: 0 11px 15px -7px rgba(0,0,0,.2), 0 24px 38px 3px rgba(0,0,0,.14),
+}
+
+.cb-instructions-close-button {
+  position: absolute;
+  right: 0;
+  top: 0;
+  background-color: transparent;
+  border: 0;
+  font-size: 1.5rem;
+}
+
+#instructions .cb-trip-list {
+  overflow-y: scroll;
+  height: 140px;
+  margin-bottom: 0;
+}
+
+@media (max-width: 599px) {
+  #instructions {
+    right: 0;
+    left: 0;
+    bottom: 0;
+    width: auto;
+    margin: 0;
+    z-index: 4;
+  }
+  #instructions .cb-instructions-close-button {
+    width: 50px;
+    height: 50px;
+  }
+}
+
+
+
+.cb-lnglat-clicked-map {
+  display: none;
+}
+
+
+.cb-weather-btn-container {
+  position: absolute;
+  right: 0;
+  top: 241px;
+}
+
+.cb-weather-btn {
+  margin: 10px 10px 0 0;
+  float: right;
+  display: block;
+  clear: both;
+  width: 29px;
+  height: auto;
+  border: 0;
+  border-radius: 4px;
+  box-shadow: 0 0 0 2px rgba(0,0,0,.1);
+  background: #fff;
+  position: relative;
+  cursor: pointer;
+  padding: 2px;
+}
+
+.cb-weather-btn:hover {
+  background-color: #f2f2f2;
+}
+
+.cb-weather-btn:focus {
+  box-shadow: 0 0 2px 2px #0096ff;
+  outline: 0;
+}
+
+/* Weather Button on Cellphones */
+@media (max-width: 599px) {
+  .cb-weather-btn-container {
+    top: 290px;
+  }
+  .cb-weather-btn {
+    width: 50px;
+  }
+}
+
+.cb-weather-btn-element {
+  /* width: 28px; */
+  background-repeat: no-repeat;
+  /* background-size: contain; */
+  background-size: 30px 30px;
+  background-position: 50% 95%;
+  height: 44px;
+}
+
+.cb-weather-btn .cb-city-temp.cb-weather-btn-temp {
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  font-family: 'Ubuntu', sans-serif;
+  color: rgb(58, 56, 54);
+}
+
+.cb-weather-btn-icon {
+  width: 23px;
+  height: 23px;
+  overflow: hidden;
+  border-radius: 4px;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+
+.cb-weather-btn-icon img {
+  width: 28px;
+  margin-left: -2px;
+  margin-top: -4px;
+  background-color: lightblue;
+}
+
+.cb-weather-popup-container {
+  width: 200px;
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 50px;
+}
+
+/* Weather Popup on Cellphones */
+@media (max-width: 599px) {
+  .cb-weather-popup-container {
+    margin-top: 85px;
+  }
+}
+
+.cb-weather-popup-info {
+  /* position: relative;
+  left: -50%; */
+  font-family: 'Ubuntu', sans-serif;
+  color: rgba(58,56,54,1);
+  background-color: #fff;
+  box-shadow: 0 11px 15px -7px rgba(0,0,0,.2), 0 24px 38px 3px rgba(0,0,0,.14), 0 9px 46px 8px rgba(0,0,0,.12);
+  border-radius: 4px;   
+  padding: 10px;
+  /* margin: 0;
+  list-style-type: none;
+  padding: 10px; */
+}
+
+.cb-weather-popup-info .cb-weather-close-button {
+  position: absolute;
+  right: 0;
+  top: 0;
+  border: 0;
+  background-color: transparent;
+}
+
+.cb-weather-popup-info h2 {
+  margin-top: 0;
+  margin-bottom: .2rem;
+  font-size: 1.1rem;
+}
+
+.cb-weather-popup-info .cb-weather-city {
+  margin: .2rem 0;
+  font-size: .8rem;
+}
+
+.cb-weather-popup-info h2, 
+.cb-weather-popup-info h4, 
+.cb-weather-popup-info h5 {
+  font-weight: 500;
+}
+
+/* .cb-weather-popup-info h2 span {
+  text-transform: lowercase;
+} */
+
+.cb-weather-popup-info h2 .cb-country-abbr {
+  text-transform: capitalize;
+}
+
+.cb-weather-popup-column {
+  display: inline-block;
+  vertical-align: top;
+  width: 85px;
+  text-align: center;
+}
+
+/* .cb-weather-popup-column:nth-child(2) {
+  width: 48%;
+} */
+
+.cb-weather-popup-column:first-child {
+  display: inline-block;
+  vertical-align: top;
+  width: 50%;
+}
+
+.cb-weather-popup-column .cb-city-temp,
+.cb-weather-popup-column .cb-wind-speed {
+  font-size: 2rem;
+  text-align: center;
+  font-weight: 300;
+}
+/* box-shadow: 0 0 0 2px rgba(0,0,0,.1); */
+
+.cb-weather-popup-column .cb-city-temp sup,
+.cb-weather-popup-column .cb-wind-speed sup {
+  font-size: 1rem;
+}
+
+.cb-weather-popup-column .cb-wind-direction {
+  text-align: center;
+}
+
+/* .cb-weather-popup-column .cb-wind-speed {
+
+} */
+.cb-weather-popup-column .cb-weather-description, 
+.cb-weather-popup-column .cb-wind-direction {
+  font-size: .8rem;
+}
+
+.cb-weather-icon {
+  display: block;
+  max-height: 60px;
+  overflow: hidden;
+}
+
+.cb-weather-icon img {
+  margin-top: -10px;
+  width: 90%;
+}
+
+.cb-about-container {
+  position: absolute;
+  top: 64px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 6;
+  background-color: rgb(242, 242, 242);
+  font-family: 'Ubuntu', sans-serif;
+  color: rgb(58, 56, 54);
+  transition-property: transform, -webkit-transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cb-about-container .cb-about-close-button {
+  position: absolute;
+  right: 0;
+  top: 10px;
+  font-size: 3rem;
+  border: 0;
+}
+
+.cb-about-container .cb-about-close-button:focus {
+  outline: 0;
+}
+
+.cb-about-container .cb-about-content {
+  width: 90%;
+  margin: 50px auto 0 auto;
+  max-width: 600px;
+  background-color: rgb(242, 242, 242);
+  padding: 0 5% 20px 5%;
+}
+
+.cb-about-container .cb-about-content button {
+  text-align: center;
+  line-height: 1.5rem;
+}
+
+.cb-about-container .cb-about-content button a {
+  text-decoration: none;
+  color: rgb(58, 56, 54);
+  display: block;
+}
+
+@media (max-width: 599px) {
+  .cb-about-container {
+    top: 56px;
+  }
+  .cb-about-container .cb-about-content {
+    width: 90%;
+  }
+}
+
+.cb-about-container h1, .cb-about-container h2 {
+  font-weight: 400;
+}

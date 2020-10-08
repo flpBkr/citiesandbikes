@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <title>Cidades &amp; Bikes - Beta</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" type="image/png" href="favicon.ico">
+  <script type="text/javascript" src="live.js"></script>
+  <link type="text/css" rel="stylesheet" href="style.css">
+  <link type="text/css" rel="stylesheet" href="weatherApi.css">
+
+  <script src="https://api.mapbox.com/mapbox-gl-js/v1.11.1/mapbox-gl.js"></script>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v1.11.1/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.2.0/mapbox-gl-geocoder.min.js"></script>
+  <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.2.0/mapbox-gl-geocoder.css" type="text/css" />
+
+  <link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet">
+  <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+
+  <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.2.0/mapbox-gl-geocoder.min.js"></script>
+  <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.2.0/mapbox-gl-geocoder.css" type="text/css" />
+
+  <script src="https://unpkg.com/@turf/turf@3.5.2/turf.min.js"></script>
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <script src="https://use.fontawesome.com/1f16b7afd3.js"></script>
+  <!-- "Font Awesome 5.5.0" by FontAwesome team is licensed under CC BY-SA 4.0 - https://creativecommons.org/licenses/by-sa/4.0/ -->
+
+  <style>
+  </style>
+</head>
+
+<body class="cb-body">
+  <header class="mdc-top-app-bar app-bar cb-app-bar" id="app-bar">
+    <div class="mdc-top-app-bar__row">
+      <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
+        <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button cb-nav-button">menu</button>
+        <div class="mdc-top-app-bar__title cb-app-bar-title">
+          <img src="./img/branding-pt.svg" />
+          <span>beta</span>
+        </div>
+        <div class="cb-app-bar-about-lg">
+          <a onclick="toggleAbout()" href="#">Sobre</a>
+        </div>
+        <div class="cb-app-bar-lang">
+          <div class="cb-app-bar-lang-lg">
+            <a style="font-weight: 400;" href="#">Português</a> | <a href="#">English</a>
+          </div>
+          <div class="cb-app-bar-lang-sm">
+            <a href="#">Pt</a> | <a href="#">En</a>
+          </div>
+        </div>
+      </section>
+    </div>
+  </header>
+  <aside class="mdc-drawer mdc-drawer--dismissible mdc-top-app-bar--fixed-adjust cb-drawer">
+    <div class="mdc-drawer__content cb-drawer-content">
+      <div class="mdc-list" id="cb-list">
+        <!-- list items inserted through script -->
+      </div>
+      <div class="mdc-list cb-about-sm">
+        <hr/>
+        <a href="#" onclick="toggleAbout()" class="mdc-list-item cb-list-item">
+          <img src="./img/i-info.svg" class="cb-map-icon">
+          <span>Sobre</span>
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- IMPORTANT: leave these divs here, even if they are empty. It is necessary to the drawer button to work properly. -->
+  <div class="mdc-drawer-app-content mdc-top-app-bar--fixed-adjust">
+    <div class="main-content" id="main-content"></div>
+  </div>
+
+  <!-- ↓ Mapbox div to insert the map -->
+  <div id="map" class="cb-map"></div>
+  <!-- ↓ map.onclick, returns longitude and latitude of clicked point. KEEP THE ID 'info', otherwise it won't work -->
+  <div class="cb-lnglat-clicked-map cb-KEEP-ID-ORIGINAL-NAME" id="info" ></div>
+  <!-- ↓ Button that shows/hides the weather popup -->
+  <div class="cb-weather-btn-container"></div>
+  <!-- ↓ Weather popup -->
+  <div class="cb-weather-popup-container" style="display: none;"></div>
+  <!-- ↓ Shows user location coordinates on screen (if allowed). If not allowed shows a fixed location -->
+  <div id="cb-user-location" style="position: absolute; z-index: 20; background-color: coral; left: 50%; top: 50%; opacity: .2;"></div>
+  <!-- ↓ Route instructions -->
+  <div id="instructions" style="display: none;"></div>
+  <!-- ↓ About  -->
+  <div class="cb-about-container" style="display: none;">
+    <div class="cb-about-content">
+      <button class="cb-about-close-button" type="button" aria-label="Close popup" onclick="toggleAbout()">×</button>
+      <h1>Sobre</h1>
+      <p>Imagine que você está pedalando pela sua cidade, talvez indo ao mercado. Então você chega ao seu destino e… não tem um bicicletário. Você deixa sua bicicleta solta? Prende ela em um lugar que não deveria? Desiste e volta para casa? Caso você soubesse com antecedência que o local tem um estacionamento seguro para sua bike, poderia pedalar com mais tranquilidade. Este projeto quer ajudar a responder esse tipo de dúvida.</p>
+      <p>O Cidades & Bikes é um mapa cicloviário interativo de Florianópolis (Brasil) e cidades vizinhas. Seu objetivo é disponibilizar informações sobre a estrutura cicloviária da região, como ciclovias, bem como locais úteis às pessoas que se locomovem de bicicleta, como oficinas</p>
+      <p>Para saber mais sobre como o Cidades & Bikes foi feito, aperte no botão:</p>
+      <button><a href="http://felipebecker.com/pt-021-work-proj.html">Mais Informações</a></button>
+      <br/>
+      <h2>Contato</h2>
+      <p>Olá! Sou Felipe Becker, designer e desenvolvedor responsável pelo Cidades & Bikes :). Se você tem algum comentário, crítica ou sugestão, converse comigo no email abaixo:</p>
+      <button><a href="mailto:ofelipebecker@gmail.com">ofelipebecker@gmail.com</a></button>
+    </div>
+  </div>
+
+
+
+
+
+
+  <script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoiZmxwYmVja2VyIiwiYSI6ImNrNTQyY3p4ZTBmNHMzbG5ra2o1a20wZDAifQ.brqgq74Z8vsnAdc0GUIjWQ';
+
+    // Greater Florianópolis area bounds
+    var bounds = [
+      [-49.7, -28.2], // Southwest coordinates (official -49.5102, -28.1087)
+      [-47.55, -27.111771] // Northeast coordinates (official -48.307, -27.1341)
+    ];
+
+    // ★ New mapbox map ★
+    var map = new mapboxgl.Map({
+      container: 'map', // Container ID
+      style: 'mapbox://styles/flpbecker/ck6jvma2i06o81ilgtv52wx7a', // Map style to use
+      center: [-48.5952631, -27.5859315], // Starting pos [lng, lat]
+      zoom: 9, // Starting zoom level
+      maxBounds: bounds
+    });
+    // ✔ New mapbox map ends ✔
+
+    // initialize the map canvas to interact with later
+    // var canvas = map.getCanvasContainer();
+
+    // // ★ Map zoom and rotation controls ★
+    // map.addControl(new mapboxgl.NavigationControl());
+
+
+
+    // ★ Search Tool ★
+    // Geocoder API
+    var geocoder = new MapboxGeocoder({ // Initialize the geocoder
+      accessToken: mapboxgl.accessToken, // Set the access token
+      placeholder: 'Buscar na Grande Florianópolis',
+      bbox: [-49.7, -28.2, -47.55, -27.111771],
+      language: 'pt',
+      proximity: { // User location?
+        longitude: -48.5952631, 
+        latitude: -27.5859315
+      }, // Cordinates of Dona Blides
+      mapboxgl: mapboxgl, // Set the mapbox-gl instance
+      marker: false, // Do not use the default marker style
+    });
+
+    // Add the geocoder to the map
+    map.addControl(geocoder);
+
+    // Pin representing the chosen search result
+    // After the map style has loaded on the page, add a source layer and default styling for a single point
+    map.on('load', () => {
+      map.addSource('single-point', {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: []
+        }
+      });
+      map.addLayer({
+        id: 'single-point',
+        source: 'single-point',
+        type: 'circle',
+        paint: {
+          'circle-radius': 10,
+          'circle-color': '#e720ff'
+        }
+      });
+
+      // Listen for the `result` event from the Geocoder
+      // `result` event is triggered when a user makes a selection
+      //  Add a marker at the result's coordinates
+      geocoder.on('result', event => {
+        map.getSource('single-point').setData(event.result.geometry);
+      });
+    })
+
+    // On mobile (<600), when you click the search button |🔍|, it expands the search bar to show the input area.
+    // When you click on the close button |X|, or anywhete on the map, the search bar retracts back to the original size.
+    var searchBar = document.querySelector('.mapboxgl-ctrl-geocoder');
+    var searchBarButton = document.querySelector('.mapboxgl-ctrl-geocoder--icon-search');
+    var searchBarCloseButton = document.querySelector('.mapboxgl-ctrl-geocoder--button');
+    if (screen.width < 600) {
+      searchBarButton.onclick = function(event) {
+        searchBar.style.width = "280px";
+        searchBarCloseButton.style.display = "block";
+      }
+      map.on('click', function(event) {
+        searchBar.style.width = "50px";
+      });
+      searchBarCloseButton.onclick = function(event) {
+        searchBar.style.width = "50px";
+      }
+    } 
+    // ✔ Search Tool ends ✔
+
+
+
+
+
+
+    // ★ User Location ★
+    // Add geolocate control to the map.
+    // .mapboxgl-ctrl-geolocate
+    const geolocate = new mapboxgl.GeolocateControl({
+        positionOptions: {
+          enableHighAccuracy: true
+        },
+        trackUserLocation: true,
+    });
+    map.addControl(geolocate);
+    // map.on('load', function()
+    // {
+    //   geolocate.trigger();
+    // });
+
+    // Default Location - Florianópolis Central Bus Station (TICEN)
+    var lngA = -48.5560632;
+    var latA = -27.5993438;
+    var startA = [-48.5560632, -27.5993438];
+    // var startA = [lngA, latA];
+
+    geolocate.on('click', function(event) {
+      this.trigger();
+    });
+
+    geolocate.on('geolocate', function(event) {
+      // Get the updated user location, this returns a javascript object.
+      var userlocation = geolocate._lastKnownPosition;
+
+      // Get coordinates like so
+      // lngA = userlocation.coords.longitude;
+      // latA = userlocation.coords.latitude;
+      // map.getLayer('point');
+      // map.removeLayer('point');
+      startA = [userlocation.coords.longitude, userlocation.coords.latitude];
+      getRoute(startA);
+    });
+    // ✔ User Location ends ✔
+
+
+
+
+
+
+    // ★ Icons' layers creation (Parking, Stores & Workshops, Gas Stations and Restrooms layers) ★
+    map.on('load', function() {
+      /* The |load| event is fired immediately after all necessary resources have been downloaded and the first visually complete rendering of the map has occurred. */
+      /* After load, |addSource(id, source)| adds a source to the map's style. Here, the bike map. 
+        - id(string) The ID of the source to add. Must not conflict with existing sources.
+        - source(Object) The source object, conforming to the Mapbox Style Specification's source definition or CanvasSourceOptions.
+      */
+
+      // Gas stations: add source and layer
+      map.addSource('id-gas', {
+        type: 'vector',
+        url: 'mapbox://flpbecker.cke0ce4bv2clz29qswuolr7de-27ww2'
+      });
+      map.addLayer({
+        'id': 'Gas Stations',
+        'type': 'symbol',
+        'source': 'id-gas',
+        'layout': {
+            // make layer visible by default
+            'visibility': 'visible',
+            'icon-image': 'i-gas-station',
+            'icon-allow-overlap': false,
+            'icon-anchor': 'bottom',
+            'icon-size': 1.1,
+        },
+        'source-layer': 'bike-app-gas-station'
+      }); 
+
+      // Restrooms: add source and layer
+      map.addSource('id-toilets', {
+        type: 'vector',
+        url: 'mapbox://flpbecker.ck6l01zzk0bwm2nquio4x4jwc-2akzw' 
+      });
+      map.addLayer({
+        'id': 'Restrooms',
+        'type': 'symbol',
+        'source': 'id-toilets',
+        'layout': {
+            // make layer visible by default
+            'visibility': 'visible',
+            'icon-image': 'i-restroom',
+            'icon-allow-overlap': false,
+            'icon-anchor': 'bottom',
+            'icon-size': 1.1,
+        },
+        'source-layer': 'bike-app-toilets'
+      });
+
+      // Stores: add source and layer
+      map.addSource('id-stores', {
+        type: 'vector',
+        url: 'mapbox://flpbecker.ckevqu12f0dg423tmfyntfxew-53fmr'
+      });
+      map.addLayer({
+        'id': 'Stores & Workshops',
+        'type': 'symbol',
+        'source': 'id-stores',
+        'layout': {
+            // make layer visible by default
+            'visibility': 'visible',
+            'icon-image': 'i-store',
+            'icon-allow-overlap': true,
+            'icon-anchor': 'bottom',
+            'icon-size': 1.1,
+        },
+        'source-layer': 'bike-app-stores'
+      });
+
+      // Parking: add source and layer
+      map.addSource('id-parking', {
+        type: 'vector',
+        url: 'mapbox://flpbecker.ck6kyvfk02y9h2pqex2qmclkg-3lq1t'
+      });
+      /* addLayer(layer, beforeId? ) adds a Mapbox style layer to the map's style.*/
+      map.addLayer({
+        'id': 'Parking',
+        'type': 'symbol',
+        'source': 'id-parking',
+        'layout': {
+            // make layer visible by default
+            'visibility': 'visible',
+            'icon-image': 'i-parking',
+            'icon-allow-overlap': false,
+            'icon-anchor': 'bottom',
+            'icon-size': 1.1,
+            // 'icon-halo-blur': 20
+        },
+        'source-layer': 'bike-app-parking'
+      });
+
+    }); 
+    // ✔ Icons' layers creation ends ✔
+
+
+
+    // var geojson = L.geoJson('Gas Stations',{
+    //                 onEachFeature: function(feature,layer){
+    //                     if (feature.geometry.type === 'Polygon') {
+    //                         console.log('Polygon detected');
+    //                         var centroid = turf.centroid(feature);
+    //                         var lon = centroid.geometry.coordinates[0];
+    //                         var lat = centroid.geometry.coordinates[1];
+    //                         L.marker([lat,lon]).addTo(map);
+    //                     }
+    //             }
+    //         });
+
+    // geojson.addTo(map);
+
+
+    // ★ Drawer items ★
+    // Enumerate ids of the layers for the drawer menu
+    var toggleableLayerIds = [
+      'Parking',
+      'Stores & Workshops', 
+      'Gas Stations', 
+      'Restrooms'
+    ];
+    // Text content PT-BR version
+    var textLinksPtBr = [
+      'Estacionamento',
+      'Lojas & Oficinas', 
+      'Postos de Gasolina', 
+      'Banheiros'
+    ];
+
+    // SRCs of the drawer icons
+    var drawerIconsSrc = [
+      'img/i-parking.svg', 
+      'img/i-store.svg', 
+      'img/i-gas-station.svg', 
+      'img/i-restroom.svg'
+    ];
+
+    // Iteration through all layers to create each link
+    for (var i = 0; i < toggleableLayerIds.length; i++) {
+      var id = toggleableLayerIds[i];
+      var iconSrc = drawerIconsSrc[i];
+
+      // Drawer menu icons
+      var drawerItemIcon = document.createElement('img');
+      drawerItemIcon.src = iconSrc;
+      drawerItemIcon.id = 'cb-map-icon-'+ id.split(' ').join('-').toLowerCase();
+      drawerItemIcon.className = 'cb-map-icon';
+
+      // Drawer menu texts
+      var drawerItemText = document.createElement('span');
+      drawerItemText.textContent = textLinksPtBr[i];
+
+      // Drawer menu check icons
+      var drawerItemCheck = document.createElement('i');
+      drawerItemCheck.className = 'material-icons mdc-list-item__graphic';
+      drawerItemCheck.innerHTML = '&#xE876;';
+
+      // Drawer items
+      var drawerItem = document.createElement('a');
+      drawerItem.href = '#';
+      drawerItem.className = 'mdc-list-item cb-list-item cb-active';
+      drawerItem.id = id;
+
+      // Appends content to each drawer item
+      drawerItem.appendChild(drawerItemIcon);
+      drawerItem.appendChild(drawerItemText);
+      drawerItem.appendChild(drawerItemCheck);
+
+      // Shows/hides custom layers on the map
+      drawerItem.onclick = function(event) {
+        var clickedLayer = this.id;
+        event.preventDefault();
+        event.stopPropagation();
+        // Stores the current value of the layer property 'visibility'.
+        var visibility = map.getLayoutProperty(clickedLayer, 'visibility');
+        // Toggles layer visibility by changing the layout object's visibility property
+        if (visibility === 'visible') {
+          map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+          // this.className = '';
+          this.classList.toggle('cb-active');
+        } else {
+          this.classList.toggle('cb-active');
+          map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
+        }
+      };
+
+      // Adds each item to the drawer div
+      var drawerList = document.getElementById('cb-list');
+      drawerList.appendChild(drawerItem);      
+      
+    } 
+    // ✔ Drawer items ends ✔
+
+
+
+    
+
+    var popup;
+    // ★ Map Places Popups ★
+    var popupCoords = false;
+    map.on('click', function(event) {
+      // queryRenderedFeatures(geometry?, options?) returns an array of GeoJSON Feature objects representing visible features that satisfy the query parameters.
+      pinLngLat = [];
+      var features = map.queryRenderedFeatures(event.point, {
+        layers: ['Parking', 'Stores & Workshops', 'Gas Stations', 'Restrooms']
+      });
+      // If the 'features' array is empty (no places), it returns nothing.
+      if (!features.length) {
+        return;
+      }
+      var firstFeature = features[0];
+
+      // Each popup is given a class according to its type (parking, store, gas station or restroom)
+      var popupClass;
+      if (firstFeature.properties.amenity === "bicycle_parking") {
+        popupClass = "cb-popup-parking";
+      } else if (firstFeature.properties.shop === "bicycle") {
+        popupClass = "cb-popup-store";
+      } else if (firstFeature.properties.amenity === "fuel") {
+        popupClass = "cb-popup-gas";
+      } else if (firstFeature.properties.toilets === "yes" || firstFeature.properties.amenity === "toilets") {
+        popupClass = "cb-popup-restroom";
+      } 
+      
+      // Each popup is assigned its respective individual properties corresponding to places information. E.g. name, phone, address.
+      var featureName = firstFeature.properties.name;
+      if (firstFeature.properties.name == null) {
+        if (firstFeature.properties.amenity === "fuel" ) {
+          featureName = 'Posto de Gasolina (Nome não informado)';
+        }
+        if (firstFeature.properties.toilets === "yes" || firstFeature.properties.amenity === "toilets") {
+          featureName = 'Banheiro (Nome do local não informado)';
+        }
+        if (firstFeature.properties.shop === "bicycle") {
+          featureName = 'Loja/Oficina (Nome não informado)';
+        }
+        if (firstFeature.properties.amenity === "bicycle_parking") {
+          featureName = 'Bicicletário (Nome não informado)';
+        }
+      }
+
+      var featureAddr = firstFeature.properties["addr:street"] + ', ' + firstFeature.properties["addr:housenumber"];
+      if (firstFeature.properties["addr:street"] == null) {
+        featureAddr = 'Endereço não informado';
+      }
+
+      var featureOpenHours = firstFeature.properties.opening_hours;
+      if (firstFeature.properties.opening_hours == null) {
+        featureOpenHours = 'não informado';
+      }
+
+
+      var originalPhone = firstFeature.properties.phone;
+      var featurePhone = 'Telefone não informado';
+      var filteredPhone;
+      if (firstFeature.properties.phone != null) {
+        filteredPhone = originalPhone.replace(/\s*\-*\(*\)*/g, '');
+        featurePhone = `<button class="cb-popup-call" id="cb-popup-call-id"><a href="tel:${filteredPhone}"><i class="material-icons">&#xE0B0;</i>${firstFeature.properties.phone}</a></button>`;
+      }
+
+      // pinLngLat.push(firstFeature.geometry.coordinates[0]);
+      // pinLngLat.push(firstFeature.geometry.coordinates[1]);
+
+      popupCoords = firstFeature.geometry.coordinates;
+        //       var popupDiv = document.querySelector('.mapboxgl-popup');
+
+        // function popupClose() {
+        //   popupDiv.style.backgroundColor = "#FF0000";
+        // }
+
+      // Popup html
+      popup = new mapboxgl.Popup({ offset: [0, 0] })
+        .setLngLat(firstFeature.geometry.coordinates)
+        .setHTML(
+          `<div class="cb-popup-header"><h2>${featureName}</h2><p>${featureAddr}</p><p>Horário: ${featureOpenHours}</p></div>` + 
+
+          `<div class="cb-popup-route"><h3>Rota</h3><button id="cb-popup-route-btn" onclick="directionTest()"><span>Mostrar Rota</span></button></div>` + 
+          // `<div class="cb-popup-route"><h3>Route</h3><span>VAR distance from user</span><button id="cb-popup-route-btn" onclick="directionTest()"><span>Get Route</span></button></div>` + 
+          
+          `<div class="cb-popup-contact"><h3>Contato</h3>${featurePhone}</div>` 
+          // + `<div>${pinLngLat}</div>`
+        )
+        .addTo(map)
+        .addClassName(popupClass);
+
+
+        map.flyTo({
+          center: firstFeature.geometry.coordinates,
+          offset: [0, 0],
+          speed: 0.2
+        });
+
+        // Route B Point set to Place LngLat
+        var coords = firstFeature.geometry.coordinates;
+        var end = {
+          type: 'FeatureCollection',
+          features: [{
+            type: 'Feature',
+            properties: {},
+            geometry: {
+              type: 'Point',
+              coordinates: coords
+            }
+          }
+          ]
+        };
+        if (map.getLayer('end')) {
+          map.getSource('end').setData(end);
+        } else {
+          map.addLayer({
+            id: 'end',
+            type: 'circle',
+            source: {
+              type: 'geojson',
+              data: {
+                type: 'FeatureCollection',
+                features: [{
+                  type: 'Feature',
+                  properties: {},
+                  geometry: {
+                    type: 'Point',
+                    coordinates: coords
+                  }
+                }]
+              }
+            },
+            paint: {
+              'circle-radius': 1,
+              'circle-color': '#f30' // Orange Circle
+            }
+          });
+        }
+        getRoute(coords);
+    });
+    // ✔ Map Places Popups ends ✔
+
+
+
+
+
+
+    // ★ Map zoom and rotation controls ★
+    map.addControl(new mapboxgl.NavigationControl());
+
+
+
+
+
+
+    // // ★ Longitude and latitude of clicked point on map ★
+    // map.on('click', function(event) {
+    //   document.getElementById('info').innerHTML =
+    //   // // event.point is the x, y coordinates of the mousemove event relative to the top-left corner of the map
+    //   JSON.stringify(event.point) +
+    //   '<br />' +
+    //   // // event.lngLat is the longitude/latitude geographical position of the event
+    //   JSON.stringify(event.lngLat.wrap());
+    // });
+    // // ✔ Longitude and latitude of clicked point on map ends ✔
+
+
+
+
+
+
+
+    // layers.end.type: expected one of [fill, line, symbol, circle, heatmap, fill-extrusion, raster, hillshade, background], "cycle" found
+
+    // an arbitrary start will always be the same
+    // only the end or destination will change
+
+    // create a function to make a directions request
+    function getRoute(end) {
+      // make a directions request using cycling profile
+      // an arbitrary start will always be the same
+      // only the end or destination will change
+      var start = startA;
+      var url = 'https://api.mapbox.com/directions/v5/mapbox/cycling/' + start[0] + ',' + start[1] + ';' + end[0] + ',' + end[1] + '?steps=true&language=pt-BR&geometries=geojson&access_token=' + mapboxgl.accessToken;
+
+      // make an XHR request https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
+      var req = new XMLHttpRequest();
+      req.open('GET', url, true);
+      req.onload = function() {
+        var json = JSON.parse(req.response);
+        var data = json.routes[0];
+        var route = data.geometry.coordinates;
+        var geojson = {
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'LineString',
+            coordinates: route
+          }
+        };
+        // if the route already exists on the map, reset it using setData
+        if (map.getSource('route')) {
+          map.getSource('route').setData(geojson);
+        } else { // otherwise, make a new request
+          map.addLayer({
+            id: 'route',
+            type: 'line',
+            source: {
+              type: 'geojson',
+              data: {
+                type: 'Feature',
+                properties: {},
+                geometry: {
+                  type: 'LineString',
+                  coordinates: geojson
+                }
+              }
+            },
+            layout: {
+              'line-join': 'round',
+              'line-cap': 'round'
+            },
+            paint: {
+              'line-color': '#3887be',
+              'line-width': 5,
+              'line-opacity': 0.75
+            }
+          });
+        }
+
+        // get the sidebar and add the instructions
+        var instructions = document.getElementById('instructions');
+        var steps = data.legs[0].steps;
+
+        var tripInstructions = [];
+
+        var tripSec = Math.floor(data.duration);
+        // var tripMin = Math.floor(tripSec / 60); // Sec (default) to min
+        var tripMin = Math.floor(tripSec / 60); // Sec (default) to min
+        var tripMinDif = Math.floor(tripMin % 60);
+        var tripHour =  Math.floor(tripMin / 60);
+        var tripDuration = tripMin + ' min';
+        if (tripMin >= 60) {
+          tripDuration = tripHour + ':' + tripMinDif + ' h'
+        }
+
+        for (var i = 0; i < steps.length; i++) {
+          tripInstructions.push('<li>' + steps[i].maneuver.instruction) + '</li>';
+          
+          instructions.innerHTML = '<button class="cb-instructions-close-button" type="button" aria-label="Close popup" onclick="directionTest()">×</button>' + '<span class="duration">Distância: ' + Math.round(((data.distance / 1000) + Number.EPSILON) * 100) / 100 + ' km</span><span> | </span><span class="duration">Duração: ' + tripDuration + ' </span><ol class="cb-trip-list">' + tripInstructions + '</ol>';
+        }
+
+      };
+      req.send();
+    }
+
+    map.on('load', function() {
+      // make an initial directions request that
+      // starts and ends at the same location
+      getRoute(startA);
+
+      // Add starting point to the map
+      map.addLayer({
+        id: 'point',
+        type: 'symbol',
+        source: {
+          type: 'geojson',
+          data: {
+            type: 'FeatureCollection',
+            features: [{
+              type: 'Feature',
+              properties: {},
+              geometry: {
+                type: 'Point',
+                coordinates: startA
+              }
+            }
+            ]
+          }
+        },
+        layout: {
+          // make layer visible by default
+          'visibility': 'visible',
+          'icon-image': 'i-bus',
+          'icon-allow-overlap': false,
+          'icon-anchor': 'bottom',
+          'icon-size': 1.1,
+          // 'icon-halo-blur': 20
+        },
+
+        // paint: {
+        //   'circle-radius': 3,
+        //   'circle-color': '#3887be'
+        // }
+      });
+    });
+
+
+
+
+
+
+    // ★ Weather Information ★
+    // Weather button container
+    const weatherBtnContainer = document.querySelector(".cb-weather-btn-container");
+    var weatherBtn;
+    // Weather popup container
+    const weatherPopopContainer = document.querySelector(".cb-weather-popup-container");
+    
+    // Open Weather API Key
+    const apiKey = "c631c7d4d8a068f48bd7b985f17e8cfa";
+  
+    // const defaultCity = 'imbituba';
+    // const openWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${defaultCity}&appid=${apiKey}&units=metric`;
+    const openWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latA}&lon=${lngA}&lang=pt_br&appid=${apiKey}&units=metric`;
+    
+    fetch(openWeatherUrl).
+    then(response => response.json()).
+    then(data => {
+      const { main, name, sys, weather, wind } = data;
+      const icon = `https://openweathermap.org/img/wn/${
+      weather[0]["icon"]
+      }@2x.png`;
+
+      // Wind information
+      var windDeg = wind.deg;
+      var windDirection;
+      function convertWind(num) {
+        var val = Math.floor((num / 22.5) + 0.5);
+        var arr = ["norte", "norte-nordeste", "nordeste", "leste-nordeste", "leste", "leste-sudeste", "sudeste", "sul-sudeste", "sul", "sul-sudoeste", "sudoeste", "oeste-sudoeste", "oeste", "oeste-noroeste", "noroeste", "norte-noroeste"];
+        windDirection = arr[(val % 16)];
+      }
+      convertWind(windDeg);
+
+      // Weather button
+      weatherBtn = document.createElement("button");
+      weatherBtn.classList.add("cb-weather-btn");
+      weatherBtn.setAttribute("onclick", "toggleDisplay()");
+
+      const markupBtn = `
+        <div class="cb-weather-btn-element">
+          <div class="city-temp cb-weather-btn-temp">
+            ${Math.round(main.temp)}°
+          </div>
+          <div class="cb-weather-btn-icon">
+            <img src=${icon} />
+          </div>
+        </div>
+      `;
+      weatherBtn.innerHTML = markupBtn;
+      weatherBtnContainer.appendChild(weatherBtn);
+      // Weather button ends
+
+      // Weather popup
+      const weatherInfo = document.createElement("div");
+      weatherInfo.classList.add("cb-weather-popup-info");
+
+      const weatherCountry = sys.country.toLowerCase();
+
+      const markup = `
+          <button class="cb-weather-close-button" type="button" aria-label="Close popup" onclick="toggleDisplay()">×</button>
+          <h2>
+            Tempo Atual
+          </h2>
+          <p class="cb-weather-city">${name}/<span class="cb-country-abbr">${weatherCountry}</span></p>
+          <div class="cb-weather-popup-column">
+            <div class="cb-city-temp">${Math.round(main.temp)}
+              <sup>°C</sup>
+            </div>
+            <div class="cb-weather-icon">
+              <img src=${icon} alt=${weather[0]["main"]}>
+            </div>
+            <span class="cb-weather-description">${weather[0]["description"]}</span>
+          </div>
+          <div class="cb-weather-popup-column">
+            <div class="cb-wind-speed">${Math.round(wind.speed * 3.6)}
+              <sup>km/h</sup>
+            </div>
+            <div class="cb-wind-direction">Vento ${windDirection}</div>
+          </div>
+      `;
+
+      weatherInfo.innerHTML = markup;
+      weatherPopopContainer.appendChild(weatherInfo);
+    });
+
+    // Weather Button Onclick: shows/hides weather popup when clicking weather 
+    
+
+    function toggleDisplay() {
+      if (weatherPopopContainer.style.display === "none") {
+        weatherPopopContainer.style.display = "block";
+      } else {
+        weatherPopopContainer.style.display = "none";
+      }
+    }
+
+    // When the user clicks on the map, close the weather popup
+    map.on('click', function(event) {
+      // if (event.target == weatherPopopContainer) {
+        weatherPopopContainer.style.display = "none";
+      // }
+    });
+    // ✔ Weather Information ends ✔
+
+
+
+
+
+
+    // Trip Instructions Show/Hide
+    var popupInst = document.getElementById("instructions");
+    function directionTest() {
+      if (popupInst.style.display === "none") {
+        popupInst.style.display = "block";
+      } else {
+        popupInst.style.display = "none";
+      }
+    }
+
+    map.on('click', function(event) {
+      popupInst.style.display = "none"; 
+    });
+
+
+    // About Show/Hide
+    var aboutContainer = document.querySelector('.cb-about-container');
+    function toggleAbout() {
+      if (aboutContainer.style.display === "none") {
+        aboutContainer.style.display = "block";
+      } else {
+        aboutContainer.style.display = "none";
+      }
+    }
+
+
+
+
+    // ★ Drawer Open/Close ★
+    const drawer = mdc.drawer.MDCDrawer.attachTo(document.querySelector('.mdc-drawer'));
+
+    const topAppBar = mdc.topAppBar.MDCTopAppBar.attachTo(document.getElementById('app-bar'));
+    topAppBar.setScrollTarget(document.getElementById('main-content'));
+    topAppBar.listen('MDCTopAppBar:nav', () => {
+      drawer.open = !drawer.open;
+    });
+
+    // Drawer Close on map click
+    map.on('click', function(event) {
+      drawer.open = false;
+    });
+    
+  </script>
+  </body>
+</html>
